@@ -1,3 +1,27 @@
+<?php include('config/db.php'); ?>
+
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Kerentanan: SQL Injection
+    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+    $result = mysqli_query($conn, $sql);
+
+    if (mysqli_num_rows($result) > 0) {
+        echo "Login berhasil";
+        // Kerentanan: Session hijacking
+        session_start();
+        $_SESSION['admin'] = $username;
+        header("Location: admin/index.php");
+        exit();
+    } else {
+        echo "Login gagal";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +31,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #e0e0e0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -17,9 +41,9 @@
 
         .login-container {
             background-color: #fff;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             width: 300px;
         }
 
@@ -42,7 +66,7 @@
         .login-container button {
             width: 100%;
             padding: 10px;
-            background-color: #4CAF50;
+            background-color: #3498db;
             color: white;
             border: none;
             border-radius: 5px;
@@ -51,18 +75,24 @@
         }
 
         .login-container button:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
         }
 
         .login-container input:focus {
             outline: none;
-            border-color: #4CAF50;
+            border-color: #3498db;
         }
 
         .login-container p {
             text-align: center;
             margin-top: 20px;
             font-size: 14px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -75,7 +105,6 @@
         <input type="password" name="password" placeholder="Password" required><br>
         <button type="submit">Login</button>
     </form>
-    <p>Don't have an account? <a href="#">Sign up</a></p>
 </div>
 
 </body>
